@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 import {LoadingOutlined} from '@ant-design/icons'
 
 
-//component ui inmports:--
+//component ui inmports(shadcn):-- 
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -20,10 +20,13 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { createUserAccount } from "@/lib/appwrite/api"
+import { useToast } from "@/components/ui/use-toast"
 
 
 const SignupForm = () => {
   const isLoading = false;
+  const { toast } = useToast();
+
   
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -40,7 +43,13 @@ const SignupForm = () => {
     //create user 
     const newUser = await createUserAccount(values);
 
-    console.log(newUser);
+    if(!newUser){
+      return toast({ title: "Signup Failed. Please try again."})
+    }
+
+    //Sign in our User into the session 
+    // const session = await signInAccount()
+
 
 }
   return (
