@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { SignupValidation } from "@/lib/validation"
 import { useForm } from "react-hook-form"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 // ant-design
 import {LoadingOutlined} from '@ant-design/icons'
@@ -19,14 +19,20 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { createUserAccount } from "@/lib/appwrite/api"
 import { useToast } from "@/components/ui/use-toast"
+
+import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations"
+import { useUserContext } from "@/context/AuthContext"
 
 
 const SignupForm = () => {
-  const isLoading = false;
   const { toast } = useToast();
+  const {checkAuthUser, isLoading : isUserLoading} = useUserContext();
+  const navigate = useNavigate();
 
+  const {mutateAsync: createUserAccount, isPending: isCreatingAccount} = useCreateUserAccount();
+  
+  const {mutateAsync : signInAccount,  isPending: isSigningIn} = useSignInAccount();
   
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -47,10 +53,29 @@ const SignupForm = () => {
       return toast({ title: "Signup Failed. Please try again."})
     }
 
-    //Sign in our User into the session 
-    // const session = await signInAccount()
+    //Sign in our User into the session (tanStack Query)
+    const session = await signInAccount({
+      email: values.email, // coming from form
+      password: values.password,
 
+    })
 
+    if(!session){
+      return toast({ title: "Signin Failed. Please try again."})
+    }
+    
+    // storing sessions in react context : 
+    // we get here bollean value back in isLoggedin
+    const isLoggedIn = await checkAuthUser();
+
+    // if it return true then: 
+    if(isLoggedIn){
+      form.reset();
+      navigate('/home')
+    }else {
+      // else we dont logged in successfully then show a toast
+      return toast({title: 'sign up failed, Please try again'})
+    }
 }
   return (
     <Form {...form}>
@@ -121,7 +146,7 @@ const SignupForm = () => {
             )}
           />
           <Button type="submit" className="w-full shad-button_primary">
-            {isLoading ? (
+            {isCreatingAccount ? (
               <div className="flex-center gap-2">
                 <LoadingOutlined/> Loading...
               </div>
