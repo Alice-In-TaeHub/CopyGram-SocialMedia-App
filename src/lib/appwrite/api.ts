@@ -200,3 +200,18 @@ export async function deleteFile(fileId: string){
       console.log(error);
   }
 }
+
+
+// function for showing post on home page
+
+export async function getRecentPosts(){
+  const posts = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.postCollectionId,
+    // orderDesc(createAt))show tht latest posts will appear on top
+    [Query.orderDesc('$createdAt'), Query.limit(20)]
+  )
+
+  if(!posts) throw Error;
+  return posts
+}
