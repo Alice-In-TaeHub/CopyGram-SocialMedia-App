@@ -2,6 +2,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { formatDateString } from "@/lib/utils";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
+import PostStats from "./PostStats";
 
 type PostCardProps = {
     post: Models.Document;
@@ -9,6 +10,7 @@ type PostCardProps = {
 
 const PostCard = ({post}:PostCardProps) => {
   const {user} = useUserContext();
+  console.log({post});
   
   if(!post.creator ) return;
 
@@ -65,12 +67,14 @@ const PostCard = ({post}:PostCardProps) => {
             </div>
             {/*showing image----------------  */}
             <img 
-                src={post.imageUrl || '/assets/icons/profile-placeholder.svg'} 
+                src={post.ImageUrl || '/assets/icons/profile-placeholder.svg'} 
                 alt="post image" 
                 className="post-card_img"       
             />
         </Link>
 
+        {/*  */}
+        <PostStats post={post} userId={user.id}/>
     </div>
   )
 }

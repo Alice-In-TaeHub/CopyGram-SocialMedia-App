@@ -173,8 +173,8 @@ export async function uploadFile(file: File){
 }
 
 
-// preview Function for create post function  
-export async function getFilePreview(fileId: string){
+// preview Function to show image for create post function  
+export function getFilePreview(fileId: string){
   try {
       const fileUrl = storage.getFilePreview(
           appwriteConfig.storageId,
@@ -214,4 +214,61 @@ export async function getRecentPosts(){
 
   if(!posts) throw Error;
   return posts
+}
+
+
+//  like post function:
+export async function likePost(postId: string, likesArray: string[]){
+  try {
+    const updatePost = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      postId,
+      {
+        likes: likesArray
+      }
+    )
+    if(!updatePost) throw Error
+    return updatePost
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
+
+// save post function:
+export async function savePost(postId: string, userId: string){
+  try {
+    const updatePost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+      ID.unique(),
+      {
+        user: userId,
+        post: postId
+      }
+    )
+    if(!updatePost) throw Error
+    return updatePost
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// delete saved post function:
+export async function deleteSavedPost(savedRecordId: string){
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+     savedRecordId,
+    )
+    if(!statusCode) throw Error
+    return {status : 'ok'}
+
+  } catch (error) {
+    console.log(error);
+  }
 }
