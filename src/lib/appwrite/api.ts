@@ -298,7 +298,7 @@ export async function updatePost(post: IUpdatePost){
 
   try {
       let image = {
-        imageUrl : post.imageUrl,
+        ImageUrl : post.ImageUrl,
         imageId: post.imageId,
       }
 
@@ -315,7 +315,7 @@ export async function updatePost(post: IUpdatePost){
           throw Error
         }
         
-        image = {...image, imageUrl: fileUrl, imageId: uploadedFile.$id}
+        image = {...image, ImageUrl: fileUrl, imageId: uploadedFile.$id}
       }
 
 
@@ -329,7 +329,7 @@ export async function updatePost(post: IUpdatePost){
           post.postId,
           {
               caption : post.caption,
-              imageUrl : image.imageUrl,
+              ImageUrl : image.ImageUrl,
               imageId : image.imageId,
               location : post.location,
               tags : tags
@@ -364,4 +364,46 @@ export async function deletePost(postId: string, imageId: string){
     console.log(err);
     
   }
+}
+
+export async function getInfinitePosts({pageParam} : {pageParam : number}){
+  // query can be type of any content
+  const queries: any[] = [Query.orderDesc('$updateAt'), Query.limit(10)]
+  if(pageParam){
+    queries.push(Query.cursorAfter(pageParam.toString()))
+  }
+
+  try{
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      queries
+    )
+
+    if(!posts) throw Error
+
+    return posts
+
+  }catch(err){
+    console.log(err);
+  }
+
+}
+
+export async function searchPosts(searchTerm: string){
+   try{
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      [Query.search('caption', searchTerm)]
+    )
+
+    if(!posts) throw Error
+
+    return posts
+
+  }catch(err){
+    console.log(err);
+  }
+
 }

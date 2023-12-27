@@ -58,7 +58,7 @@ const PostForm = ({post, action}:PostFormProps) => {
         ...values,
         postId : post.$id,
         imageId : post?.imageId,
-        imageUrl : post?.imageUrl,
+        ImageUrl : post?.ImageUrl,
       })
 
       if(!updatePost){
@@ -113,7 +113,7 @@ const PostForm = ({post, action}:PostFormProps) => {
                 <FileUploader 
                     fieldChange={field.onChange}
                     // if we uplaod the post then we get url of it
-                    mediaUrl={post?.imageUrl}
+                    mediaUrl={post?.ImageUrl}
                />
             </FormControl>
             <FormMessage  className='shad-form_message' />

@@ -34,7 +34,7 @@ export type INavLink = {
     postId: string;
     caption: string;
     imageId: string;
-    imageUrl: URL;
+    ImageUrl: URL;
     file: File[];
     location?: string;
     tags?: string;
